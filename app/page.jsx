@@ -3,16 +3,20 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+
 const Home = () => {
   const router = useRouter();
+
   const [searchCity, setSearchCity] = useState("");
 
   const handleSearchChange = (e) => {
     setSearchCity(e.target.value);
   };
 
-  const handleSearchClick = () => {
-    router.push("/city");
+  const handleSearchClick =  () => {
+     router.push(
+      `/${searchCity}`
+    );
   };
 
   return (
