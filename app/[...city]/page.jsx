@@ -33,8 +33,11 @@ const City = ({ params }) => {
 
   const api = "https://geocoding-api.open-meteo.com/v1/search";
 
+  // api response
   const [data, setData] = useState();
   const [cityNotFound, setCityNotFound] = useState(false);
+
+  // weather data
   const [weatherData, setWeatherData] = useState();
   const [currentDate, setCurrentDate] = useState(null);
   const [currentTemperature, setCurrentTemperature] = useState(null);
@@ -44,6 +47,7 @@ const City = ({ params }) => {
   const [windSpeed, setWindSpeed] = useState(null);
   const [visibility, setVisibility] = useState(null);
 
+  // time
   const [currentTime, setCurrentTime] = useState(getCurrentTime());
 
   function getCurrentTime() {
