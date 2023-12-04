@@ -44,6 +44,23 @@ const City = ({ params }) => {
   const [windSpeed, setWindSpeed] = useState(null);
   const [visibility, setVisibility] = useState(null);
 
+  const [currentTime, setCurrentTime] = useState(getCurrentTime());
+
+  function getCurrentTime() {
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, "0");
+    const minutes = now.getMinutes().toString().padStart(2, "0");
+    return `${hours}:${minutes}`;
+  }
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setCurrentTime(getCurrentTime());
+    }, 60000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -199,6 +216,7 @@ const City = ({ params }) => {
   let weatherDescription = getWeatherDescription(weatherCode);
 
   const handleAddToFav = () => {
+    addCityToFavorites(cityName);
     router.push("favorites");
   };
 
@@ -227,6 +245,8 @@ const City = ({ params }) => {
           <button className="black_btn my-6" onClick={handleAddToFav}>
             Add {cityName} to Favorite list
           </button>
+
+          <p>{currentTime}</p>
 
           <div className="rounded-12 glassmorphism text-lg">
             <div className="flex flex-col sm:flex-row justify-between items-center">
