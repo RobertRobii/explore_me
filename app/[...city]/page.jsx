@@ -115,7 +115,7 @@ const City = ({ params }) => {
     if (weatherData) {
       let currentTime = Math.floor(Date.now() / 1000);
 
-      // Find the corresponding index of the current time in the 'time' array
+      // Find the corresponding index of the current time in the 'time' array returned by the api
       let currentIndex = -1;
       for (let i = 0; i < weatherData.hourly.time.length; i++) {
         if (weatherData.hourly.time[i] > currentTime) {
