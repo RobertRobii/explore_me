@@ -5,57 +5,18 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import MapLoader from "@components/MapLoader";
+import { weatherDescriptions } from "@utils/functions/weatherDesc";
 
-const City = ({ params }) => {
-  const Map = React.useMemo(
-    () =>
-      dynamic(() => import("@components/CustomMap"), {
-        loading: () => (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center">
-              <p className="text-2xl font-bold text-orange-500">
-                A map is loading
-              </p>
-              <img
-                className="mx-auto my-4"
-                src="/assets/images/loader.gif"
-                alt="Loading"
-              />
-            </div>
-          </div>
-        ),
-        ssr: false,
-      }),
-    []
-  );
+function getCurrentTime() {
+  const now = new Date();
+  const hours = now.getHours().toString().padStart(2, "0");
+  const minutes = now.getMinutes().toString().padStart(2, "0");
+  return `${hours}:${minutes}`;
+}
 
-  const router = useRouter();
-
-  const api = "https://geocoding-api.open-meteo.com/v1/search";
-
-  // api response
-  const [data, setData] = useState();
-  const [cityNotFound, setCityNotFound] = useState(false);
-
-  // weather data
-  const [weatherData, setWeatherData] = useState();
-  const [currentDate, setCurrentDate] = useState(null);
-  const [currentTemperature, setCurrentTemperature] = useState(null);
-  const [weatherCode, setWeatherCode] = useState(null);
-  const [precipitationProbability, setPrecipitationProbability] =
-    useState(null);
-  const [windSpeed, setWindSpeed] = useState(null);
-  const [visibility, setVisibility] = useState(null);
-
-  // time
-  const [currentTime, setCurrentTime] = useState(getCurrentTime());
-
-  function getCurrentTime() {
-    const now = new Date();
-    const hours = now.getHours().toString().padStart(2, "0");
-    const minutes = now.getMinutes().toString().padStart(2, "0");
-    return `${hours}:${minutes}`;
-  }
+const useCurrentTime = () => {
+  const [currentTime, setCurrentTime] = useState(getCurrentTime);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -65,31 +26,18 @@ const City = ({ params }) => {
     return () => clearInterval(intervalId);
   }, []);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`${api}?name=${params.city}`);
-        const res = await response.json();
+  return currentTime;
+};
 
-        if (res.results && res.results.length > 0) {
-          setData(res);
-          setCityNotFound(false); // Reset state if city was found
-        } else {
-          setCityNotFound(true); //  Set state if city was not found
-        }
-      } catch (error) {
-        console.log("Error fetching location data:", error);
-        setCityNotFound(true); // Set state city was not found if error
-      }
-    };
-
-    fetchData();
-  }, [params.city]);
-
-  const cityName = data && data.results[0].name;
-  const latitude = data && data.results[0].latitude;
-  const longitude = data && data.results[0].longitude;
-  const country = data && data.results[0].country;
+const useWeather = (latitude, longitude) => {
+  const [weatherData, setWeatherData] = useState();
+  const [currentDate, setCurrentDate] = useState(null);
+  const [currentTemperature, setCurrentTemperature] = useState(null);
+  const [weatherCode, setWeatherCode] = useState(null);
+  const [precipitationProbability, setPrecipitationProbability] =
+    useState(null);
+  const [windSpeed, setWindSpeed] = useState(null);
+  const [visibility, setVisibility] = useState(null);
 
   const options = { timeZone: "Europe/Bucharest" };
   const formatter = new Intl.DateTimeFormat("en", options);
@@ -157,72 +105,73 @@ const City = ({ params }) => {
     }
   }, [weatherData]);
 
-  function getWeatherDescription(code) {
-    switch (code) {
-      case 0:
-        return "Clear sky";
-      case 1:
-        return "Mainly clear";
-      case 2:
-        return "Partly cloudy";
-      case 3:
-        return "Overcast";
-      case 45:
-        return "Fog";
-      case 48:
-        return "Depositing rime fog";
-      case 51:
-        return "Drizzle: Light";
-      case 52:
-        return "Drizzle: moderate";
-      case 55:
-        return "Drizzle: dense intensity";
-      case 56:
-        return "Freezing Drizzle: Light";
-      case 57:
-        return "Freezing Drizzle: dense intensity";
-      case 61:
-        return "Rain: Slight";
-      case 63:
-        return "Rain: moderate ";
-      case 65:
-        return "Rain: heavy intensity";
-      case 66:
-        return "Freezing Rain: Light";
-      case 67:
-        return "Freezing Rain: heavy intensity";
-      case 71:
-        return "Snow fall: Slight";
-      case 73:
-        return "Snow fall: moderate";
-      case 75:
-        return "Snow fall: heavy intensity";
-      case 77:
-        return "Snow grains";
-      case 80:
-        return "Rain showers: Slight";
-      case 81:
-        return "Rain showers: moderate";
-      case 82:
-        return "Rain showers: violent";
-      case 85:
-        return "Snow showers slight";
-      case 86:
-        return "Snow showers heavy";
-      case 95:
-        return "Thunderstorm: Slight or moderate";
-      case 96:
-        return "Thunderstorm with slight";
-      case 99:
-        return "Thunderstorm with heavy hail";
-    }
-  }
-  let weatherDescription = getWeatherDescription(weatherCode);
+  return {
+    currentDate,
+    currentTemperature,
+    weatherCode,
+    precipitationProbability,
+    windSpeed,
+    visibility,
+  };
+};
+
+const City = ({ params }) => {
+  const router = useRouter();
+
+  const api = "https://geocoding-api.open-meteo.com/v1/search";
+
+  // api response
+  const [data, setData] = useState();
+  const [cityNotFound, setCityNotFound] = useState(false);
+
+  const currentTime = useCurrentTime();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${api}?name=${params.city}`);
+        const res = await response.json();
+
+        if (res.results && res.results.length > 0) {
+          setData(res);
+          setCityNotFound(false); // Reset state if city was found
+        } else {
+          setCityNotFound(true); //  Set state if city was not found
+        }
+      } catch (error) {
+        console.log("Error fetching location data:", error);
+        setCityNotFound(true); // Set state city was not found if error
+      }
+    };
+
+    fetchData();
+  }, [params.city]);
+
+  const cityName = data?.results[0].name;
+  const latitude = data?.results[0].latitude;
+  const longitude = data?.results[0].longitude;
+  const country = data?.results[0].country;
+
+  const {
+    currentTemperature,
+    weatherCode,
+    precipitationProbability,
+    windSpeed,
+    visibility,
+  } = useWeather(latitude, longitude);
 
   const handleAddToFav = () => {
-    addCityToFavorites(cityName);
     router.push("favorites");
   };
+
+  const Map = React.useMemo(
+    () =>
+      dynamic(() => import("@components/CustomMap"), {
+        loading: MapLoader,
+        ssr: false,
+      }),
+    []
+  );
 
   return (
     <div>
@@ -260,7 +209,7 @@ const City = ({ params }) => {
                 </p>
               </div>
               <p className="text-xl text-black sm:text-3xl">
-                {weatherDescription}
+                {weatherDescriptions[weatherCode]}
               </p>
             </div>
             <div className="flex flex-col sm:flex-row justify-between items-center mt-6">

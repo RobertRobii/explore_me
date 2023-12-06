@@ -1,6 +1,7 @@
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import MapLoader from "./MapLoader";
 
 const CustomMap = ({ latitude, longitude, cityName, country }) => {
   const markerIcon = new L.Icon({
@@ -9,6 +10,10 @@ const CustomMap = ({ latitude, longitude, cityName, country }) => {
     iconAnchor: [12, 41],
     popupAnchor: [1, -34],
   });
+
+  if (!latitude || !longitude) {
+    return <MapLoader />;
+  }
 
   return (
     <MapContainer

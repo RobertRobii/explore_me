@@ -1,22 +1,15 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
-
 
 const Home = () => {
   const router = useRouter();
 
-  const [searchCity, setSearchCity] = useState("");
-
-  const handleSearchChange = (e) => {
-    setSearchCity(e.target.value);
-  };
-
-  const handleSearchClick =  () => {
-     router.push(
-      `/${searchCity}`
-    );
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const searchCity = formData.get("city");
+    router.push(`/${searchCity}`);
   };
 
   return (
@@ -33,23 +26,20 @@ const Home = () => {
         journey.
       </p>
 
-      <form className="relative w-full flex-center search">
+      <form
+        className="relative w-full flex-center search"
+        onSubmit={handleSearchSubmit}
+      >
         <input
           type="text"
           placeholder="Search for cities..."
-          value={searchCity}
-          onChange={handleSearchChange}
           className="search_input peer"
+          name="city"
           required
+          autoComplete="off"
         />
 
-        <button
-          type="button"
-          onClick={handleSearchClick}
-          className="black_btn mt-5"
-        >
-          Search
-        </button>
+        <button className="black_btn mt-5">Search</button>
       </form>
     </section>
   );
