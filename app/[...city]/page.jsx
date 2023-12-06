@@ -2,127 +2,22 @@
 
 import React from "react";
 import { useState, useEffect } from "react";
+
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import Image from "next/image";
+
 import MapLoader from "@components/MapLoader";
-import { weatherDescriptions } from "@utils/functions/weatherDesc";
 
-function getCurrentTime() {
-  const now = new Date();
-  const hours = now.getHours().toString().padStart(2, "0");
-  const minutes = now.getMinutes().toString().padStart(2, "0");
-  return `${hours}:${minutes}`;
-}
-
-const useCurrentTime = () => {
-  const [currentTime, setCurrentTime] = useState(getCurrentTime);
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      setCurrentTime(getCurrentTime());
-    }, 60000);
-
-    return () => clearInterval(intervalId);
-  }, []);
-
-  return currentTime;
-};
-
-const useWeather = (latitude, longitude) => {
-  const [weatherData, setWeatherData] = useState();
-  const [currentDate, setCurrentDate] = useState(null);
-  const [currentTemperature, setCurrentTemperature] = useState(null);
-  const [weatherCode, setWeatherCode] = useState(null);
-  const [precipitationProbability, setPrecipitationProbability] =
-    useState(null);
-  const [windSpeed, setWindSpeed] = useState(null);
-  const [visibility, setVisibility] = useState(null);
-
-  const options = { timeZone: "Europe/Bucharest" };
-  const formatter = new Intl.DateTimeFormat("en", options);
-  const now = new Date();
-  const timeZone = formatter.resolvedOptions().timeZone;
-
-  const weatherApi = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,apparent_temperature,precipitation_probability,precipitation,weather_code,visibility,wind_speed_10m&timeformat=unixtime&timezone=${timeZone}`;
-
-  useEffect(() => {
-    const fetchWeather = async () => {
-      if (latitude && longitude) {
-        const weatherResponse = await fetch(weatherApi);
-        const weatherRes = await weatherResponse.json();
-        console.log(weatherRes);
-        setWeatherData(weatherRes);
-      }
-    };
-
-    fetchWeather();
-  }, [latitude, longitude, weatherApi]);
-
-  useEffect(() => {
-    if (weatherData) {
-      let currentTime = Math.floor(Date.now() / 1000);
-
-      // Find the corresponding index of the current time in the 'time' array returned by the api
-      let currentIndex = -1;
-      for (let i = 0; i < weatherData.hourly.time.length; i++) {
-        if (weatherData.hourly.time[i] > currentTime) {
-          currentIndex = i;
-          break;
-        }
-      }
-
-      // Check if the index is found and update the temperature for the current hour
-      if (currentIndex !== -1) {
-        let temperature = weatherData.hourly.temperature_2m[currentIndex];
-        setCurrentTemperature(temperature);
-
-        // Update the weather code for the current temperature
-        let weatherCode = weatherData.hourly.weather_code[currentIndex];
-        setWeatherCode(weatherCode);
-
-        // Update the precipitation probability for the current temperature
-        let precipitationProbability =
-          weatherData.hourly.precipitation_probability[currentIndex];
-        setPrecipitationProbability(precipitationProbability);
-
-        // Update the wind speed at 10 meters for the current temperature
-        let windSpeed = weatherData.hourly.wind_speed_10m[currentIndex];
-        setWindSpeed(windSpeed);
-
-        // Update the visibility for the current visibility
-        let visibility = weatherData.hourly.visibility[currentIndex];
-        setVisibility(visibility);
-      } else {
-        console.log(
-          "Nu s-a găsit temperatura, codul meteo, probabilitatea precipitatiilor, viteza vantului sau vizibilitatea pentru ora curentă."
-        );
-      }
-
-      // Update current date
-      let formattedDate = formatter.format(now);
-      setCurrentDate(formattedDate);
-    }
-  }, [weatherData]);
-
-  return {
-    currentDate,
-    currentTemperature,
-    weatherCode,
-    precipitationProbability,
-    windSpeed,
-    visibility,
-  };
-};
+import { weatherDescriptions } from "@utils/functions/weatherDescription";
+import { useCurrentTime } from "@utils/functions/time";
+import { useWeather } from "@utils/functions/weather";
 
 const City = ({ params }) => {
   const router = useRouter();
-
-  const api = "https://geocoding-api.open-meteo.com/v1/search";
-
-  // api response
   const [data, setData] = useState();
   const [cityNotFound, setCityNotFound] = useState(false);
+  const api = "https://geocoding-api.open-meteo.com/v1/search";
 
   const currentTime = useCurrentTime();
 
