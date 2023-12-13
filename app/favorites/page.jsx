@@ -1,6 +1,11 @@
 import Link from "next/link";
+import FavoriteCity from "@models/FavoriteCity";
+import { connectToDB } from "@utils/database";
 
-const Favorites = () => {
+const Favorites = async () => {
+  await connectToDB();
+  const favCity = await FavoriteCity.find();
+
   return (
     <div>
       <h1 className="small_head_text text-center">
@@ -11,21 +16,14 @@ const Favorites = () => {
 
       <div className="glassmorphism mt-10">
         <ul className="list-none grid grid-cols-2 sm:grid-cols-3 gap-4">
-          <li>
-            <Link href="/city" className="black_btn">
-              Brasov
-            </Link>
-          </li>
-          <li>
-            <Link href="/city" className="black_btn">
-              Bucuresti
-            </Link>
-          </li>
-          <li>
-            <Link href="/city" className="black_btn">
-              Piatra Neamt
-            </Link>
-          </li>
+          {favCity &&
+            favCity.map((city) => (
+              <li key={city}>
+                <Link href={`/${city.cityName}`} className="black_btn">
+                  {city.cityName}
+                </Link>
+              </li>
+            ))}
         </ul>
       </div>
     </div>

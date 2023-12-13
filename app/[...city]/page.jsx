@@ -55,8 +55,22 @@ const City = ({ params }) => {
     visibility,
   } = useWeather(latitude, longitude);
 
-  const handleAddToFav = () => {
-    router.push("favorites");
+  const handleAddToFav = async () => {
+    try {
+      const response = await fetch(`/api/favorites/${cityName}`, {
+        method: "POST",
+      });
+
+      if (!response.ok) {
+        console.error(
+          `Failed to add ${cityName} to favorites. Status: ${response.status}`
+        );
+      } else {
+        router.push("/favorites");
+      }
+    } catch (error) {
+      console.error("Error adding to favorites:", error);
+    }
   };
 
   const Map = React.useMemo(
@@ -93,8 +107,6 @@ const City = ({ params }) => {
           <button className="black_btn my-6" onClick={handleAddToFav}>
             Add {cityName} to Favorite list
           </button>
-
-          <p>{currentTime}</p>
 
           <div className="rounded-12 glassmorphism text-lg">
             <div className="flex flex-col sm:flex-row justify-between items-center">

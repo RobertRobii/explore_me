@@ -7,6 +7,7 @@ const FavoriteCitySchema = new Schema({
   },
 });
 
-const FavoriteCity = models.City || model("FavoriteCity", FavoriteCitySchema);
+const FavoriteCity =
+  models.FavoriteCity || model("FavoriteCity", FavoriteCitySchema);
 
 export default FavoriteCity;

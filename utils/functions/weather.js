@@ -22,7 +22,6 @@ export const useWeather = (latitude, longitude) => {
       if (latitude && longitude) {
         const weatherResponse = await fetch(weatherApi);
         const weatherRes = await weatherResponse.json();
-        console.log(weatherRes);
         setWeatherData(weatherRes);
       }
     };
