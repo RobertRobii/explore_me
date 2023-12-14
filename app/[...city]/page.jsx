@@ -8,9 +8,10 @@ import dynamic from "next/dynamic";
 import MapLoader from "@components/MapLoader";
 import WeatherCard from "@components/WeatherCard";
 
+import { useWeather } from "@utils/functions/weather";
+
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useWeather } from "@utils/functions/weather";
 
 const City = ({ params }) => {
   const [data, setData] = useState();
