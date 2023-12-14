@@ -129,7 +129,6 @@ const City = ({ params }) => {
     success: "bg-gray-200",
     info: "bg-gray-200",
     error: "bg-red-600",
-    warning: "bg-orange-400",
     default: "bg-indigo-600",
   };
 
@@ -147,7 +146,7 @@ const City = ({ params }) => {
       <ToastContainer
         toastClassName={({ type }) =>
           contextClass[type || "default"] +
-          " relative flex p-1 min-h-10 rounded-md justify-between overflow-hidden cursor-pointer"
+          " relative flex p-1 min-h-10 rounded-md justify-between overflow-hidden cursor-pointer w-[300px]"
         }
         bodyClassName={() => "text-sm text-black font-inter font-med block p-3"}
       />
@@ -172,7 +171,7 @@ const City = ({ params }) => {
             />
           </div>
 
-          <div className="flex justify-between">
+          <div className="flex flex-col sm:flex-row justify-between">
             <button className="black_btn my-6" onClick={handleAddToFav}>
               Add {cityName} to Favorite list
             </button>
