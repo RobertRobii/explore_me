@@ -57,6 +57,7 @@ const City = ({ params }) => {
   } = useWeather(latitude, longitude);
 
   const [cityAddedMessage, setCityAddedMessage] = useState(null);
+  const [cityRemovedMessage, setCityRemovedMessage] = useState(null);
 
   const handleAddToFav = async () => {
     try {
@@ -90,6 +91,40 @@ const City = ({ params }) => {
       }
     } catch (error) {
       console.error("Error adding to favorites:", error);
+    }
+  };
+
+  const handleRemoveFromFav = async () => {
+    try {
+      const response = await fetch(`/api/favorites/${cityName}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        console.error(
+          `Failed to remove ${cityName} from favorites. Status: ${response.status}`
+        );
+      } else {
+        const result = await response.json();
+
+        const message = result.success
+          ? result.isNew
+            ? `${cityName} removed from favorite list!`
+            : `${cityName} is not in your favorite list!`
+          : "Error while removing from favorite list!";
+
+        setCityRemovedMessage(message);
+
+        if (message === `${cityName} removed from favorite list!`) {
+          toast.success(message);
+        } else if (message === `${cityName} is not in your favorite list!`) {
+          toast.info(message);
+        } else {
+          toast.error(message);
+        }
+      }
+    } catch (error) {
+      console.error("Error removing from favorites:", error);
     }
   };
 
@@ -141,9 +176,14 @@ const City = ({ params }) => {
             />
           </div>
 
-          <button className="black_btn my-6" onClick={handleAddToFav}>
-            Add {cityName} to Favorite list
-          </button>
+          <div className="flex justify-between">
+            <button className="black_btn my-6" onClick={handleAddToFav}>
+              Add {cityName} to Favorite list
+            </button>
+            <button className="black_btn my-6" onClick={handleRemoveFromFav}>
+              Delete {cityName} from Favorite list
+            </button>
+          </div>
 
           <div className="rounded-12 glassmorphism text-lg">
             <div className="flex flex-col sm:flex-row justify-between items-center">

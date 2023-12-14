@@ -5,7 +5,6 @@ import { connectToDB } from "@utils/database";
 const Favorites = async () => {
   await connectToDB();
   const favCity = await FavoriteCity.find();
-  // console.log(favCity);
 
   return (
     <div>
