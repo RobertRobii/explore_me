@@ -1,5 +1,6 @@
 import "@styles/globals.css";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 export const metadata = {
   title: "ExploreMe",
@@ -18,6 +19,7 @@ const RootLayout = ({ children }) => {
         <main className="app">
           <Navbar />
           {children}
+          <Footer />
         </main>
       </body>
     </html>
