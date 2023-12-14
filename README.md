@@ -16,7 +16,7 @@ pnpm dev
 # or
 bun dev
 ```
-Then, create a .env.local file and enter the following: MONGODB_URI=<your mongodb uri>
+Then, create a .env.local file and enter the following: MONGODB_URI=your mongodb uri
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
