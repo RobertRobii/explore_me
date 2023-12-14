@@ -10,16 +10,17 @@ import Image from "next/image";
 import MapLoader from "@components/MapLoader";
 
 import { weatherDescriptions } from "@utils/functions/weatherDescription";
-import { useCurrentTime } from "@utils/functions/time";
 import { useWeather } from "@utils/functions/weather";
+
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const City = ({ params }) => {
   const router = useRouter();
   const [data, setData] = useState();
   const [cityNotFound, setCityNotFound] = useState(false);
-  const api = "https://geocoding-api.open-meteo.com/v1/search";
 
-  const currentTime = useCurrentTime();
+  const api = "https://geocoding-api.open-meteo.com/v1/search";
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,6 +56,8 @@ const City = ({ params }) => {
     visibility,
   } = useWeather(latitude, longitude);
 
+  const [cityAddedMessage, setCityAddedMessage] = useState(null);
+
   const handleAddToFav = async () => {
     try {
       const response = await fetch(`/api/favorites/${cityName}`, {
@@ -66,11 +69,37 @@ const City = ({ params }) => {
           `Failed to add ${cityName} to favorites. Status: ${response.status}`
         );
       } else {
-        router.push("/favorites");
+        const result = await response.json();
+
+        // Verify if the city was added now or already added
+        const message = result.success
+          ? result.isNew
+            ? `${cityName} added to favorite list!`
+            : `${cityName} already added to favorite list!`
+          : "Error while adding to favorite list!";
+
+        setCityAddedMessage(message);
+
+        if (message === `${cityName} added to favorite list!`) {
+          toast.success(message);
+        } else if (message === `${cityName} already added to favorite list!`) {
+          toast.info(message);
+        } else {
+          toast.error(message);
+        }
       }
     } catch (error) {
       console.error("Error adding to favorites:", error);
     }
+  };
+
+  //  TOAST NOTIFICATION
+  const contextClass = {
+    success: "bg-gray-200",
+    info: "bg-gray-200",
+    error: "bg-red-600",
+    warning: "bg-orange-400",
+    default: "bg-indigo-600",
   };
 
   const Map = React.useMemo(
@@ -84,6 +113,14 @@ const City = ({ params }) => {
 
   return (
     <div>
+      <ToastContainer
+        toastClassName={({ type }) =>
+          contextClass[type || "default"] +
+          " relative flex p-1 min-h-10 rounded-md justify-between overflow-hidden cursor-pointer"
+        }
+        bodyClassName={() => "text-sm text-black font-inter font-med block p-3"}
+      />
+
       {cityNotFound ? (
         <p className="text-2xl font-bold orange_gradient">
           City not found. Please enter a valid city name.

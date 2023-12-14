@@ -3,8 +3,6 @@ import { NextResponse } from "next/server";
 import FavoriteCity from "@models/FavoriteCity";
 
 export async function POST(request, { params }) {
-  // console.log(params);
-
   try {
     await connectToDB();
     const cityName = params.cityName[0];
@@ -15,12 +13,22 @@ export async function POST(request, { params }) {
       await FavoriteCity.create({
         cityName,
       });
+
+      return NextResponse.json({
+        success: true,
+        isNew: true,
+      });
+    } else {
+      return NextResponse.json({
+        success: true,
+        isNew: false,
+      });
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    return NextResponse.json({
+      success: false,
+      isNew: false,
+    });
   }
-
-  return NextResponse.json({
-    success: true,
-  });
 }
