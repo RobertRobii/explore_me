@@ -8,9 +8,9 @@ Unleash the power of a user-friendly web application that lets you discover citi
 
 ## Getting Started
 
-First, run the development server:
+First, install the dependencies:
 ```bash
-npm install to install all the dependencies
+npm install
 ```
 
 Then, create a .env.local file and enter the following: 
