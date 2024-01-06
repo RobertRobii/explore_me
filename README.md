@@ -2,7 +2,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## About this app
 
-![image](https://github.com/RobertRobii/explore_me/assets/108672392/11784ae4-cb0b-4383-8132-1fbe67d2b8ae)
+![image](https://github.com/RobertRobii/explore_me/assets/108672392/4127a730-f7ed-4446-a8e3-69ff9a5767d4)
 
 Unleash the power of a user-friendly web application that lets you discover cities, access detailed information, and build a personalized collection of favorites. Intelligent recommendations enhance your journey.
 
